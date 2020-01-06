@@ -1,4 +1,5 @@
 import nodeExternals from 'webpack-node-externals';
+import Dotenv from 'dotenv-webpack';
 import path from 'path';
 
 const root = path.resolve(__dirname, '..');
@@ -30,7 +31,10 @@ const config = {
     alias: {
       '@': path.join(root, 'src')
     }
-  }
+  },
+  plugins: [
+    new Dotenv()
+  ]
 }
 
 export default config;
