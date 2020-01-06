@@ -1,3 +1,4 @@
 # Cryptowatch
 **/node_modules
 downloader/dist
+.env
