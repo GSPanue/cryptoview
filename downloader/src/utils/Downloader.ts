@@ -13,7 +13,7 @@ class Downloader {
     this.params = params;
   }
 
-  async getData(): Promise<object> {
+  async getData(): Promise<Response> {
     try {
       return await axios.get(this.api, { ...this.params });
     }
@@ -21,7 +21,7 @@ class Downloader {
       console.log(`Could not get data from the following web service: ${this.api}`);
       console.log(`Reason: ${error.message}`);
 
-      return null;
+      return error;
     }
   }
 }
