@@ -21,7 +21,7 @@ class Downloader {
       console.log(`Could not get data from the following web service: ${this.api}`);
       console.log(`Reason: ${error.message}`);
 
-      return error;
+      return Promise.reject(new Error(error));
     }
   }
 }
