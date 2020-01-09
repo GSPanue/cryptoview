@@ -11,19 +11,19 @@ class DBInterface {
     this.password = password;
   }
 
-  connect() {
+  connect(): void {
     /**
      * @todo Connect to AWS
      */
   }
 
-  disconnect() {
+  disconnect(): void {
     /**
      * @todo Disconnect from AWS
      */
   }
 
-  store(data: object) {
+  store(data: object): void {
     /**
      * @todo Store data
      * @todo Output data stored
