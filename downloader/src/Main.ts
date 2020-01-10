@@ -17,12 +17,35 @@ class Main {
 
     try {
       // Download data from APIs
-      const [coinMarketCapData, coinlayerData, coinCapData] = await Promise.all(downloaders.map((downloader) => {
+      const [
+        coinMarketCapData,
+        coinlayerData,
+        coinCapData,
+        cryptoCompareData
+      ] = await Promise.all(downloaders.map((downloader) => {
         return downloader.getData();
       }));
+
+      // Get quotes from data
+      const coinMarketCapQuotes = coinMarketCapData.data.data;
+      const coinlayerQuotes = coinlayerData.data.rates;
+      const coinCapQuotes = coinCapData.data.data;
+      const cryptoCompareQuotes = cryptoCompareData.data;
+
+      const quotes = [
+        coinMarketCapQuotes,
+        coinlayerQuotes,
+        coinCapQuotes,
+        cryptoCompareQuotes
+      ];
+
+      // Get averages
+      const averageBTC = this.getAverageQuote(quotes, 'BTC');
+      const averageETH = this.getAverageQuote(quotes, 'ETH');
+      const averageLTC = this.getAverageQuote(quotes, 'LTC');
+      const averageXRP = this.getAverageQuote(quotes, 'XRP');
     }
-    catch {
-      console.log('reached!!');
+    catch (err) {
       this.shouldStoreData = false;
     }
   }
@@ -50,7 +73,33 @@ class Main {
       }
     });
 
-    return [coinMarketCapDownloader, coinlayerDownloader, coinCapDownloader];
+    const cryptoCompareDownloader = new Downloader('https://min-api.cryptocompare.com/data/pricemulti', {
+      params: {
+        api_key: process.env.cryptoCompareKey,
+        fsyms: 'BTC,ETH,LTC,XRP',
+        tsyms: 'USD'
+      }
+    });
+
+    return [
+      coinMarketCapDownloader,
+      coinlayerDownloader,
+      coinCapDownloader,
+      cryptoCompareDownloader
+    ];
+  }
+
+  getAverageQuote(quotes: Array<any>, symbol: string): number {
+    let sum: number = 0;
+
+    sum += parseFloat(quotes[0][symbol].quote.USD.price.toString());
+    sum += parseFloat(quotes[1][symbol].toString());
+    sum += parseFloat(quotes[2][
+      quotes[2].findIndex((currency: CoinCapObject) => (currency.symbol === symbol))
+    ].priceUsd.toString());
+    sum += parseFloat(quotes[3][symbol].USD.toString());
+
+    return sum / 4;
   }
 }
 
