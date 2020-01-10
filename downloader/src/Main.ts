@@ -13,7 +13,7 @@ class Main {
   }
 
   async start() {
-    const downloaders: Array<APIDownloader> = this.createDownloaders();
+    const APIDownloaders: Array<APIDownloader> = this.createAPIDownloaders();
 
     try {
       // Download data from APIs
@@ -22,8 +22,8 @@ class Main {
         coinlayerData,
         coinCapData,
         cryptoCompareData
-      ] = await Promise.all(downloaders.map((downloader) => {
-        return downloader.getData();
+      ] = await Promise.all(APIDownloaders.map((APIDownloader) => {
+        return APIDownloader.getData();
       }));
 
       // Get quotes from data
@@ -55,7 +55,7 @@ class Main {
     }
   }
 
-  createDownloaders(): Array<APIDownloader> {
+  createAPIDownloaders(): Array<APIDownloader> {
     const coinMarketCapDownloader = new APIDownloader('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest', {
       headers: {
         'X-CMC_PRO_API_KEY': process.env.coinMarketCapKey
