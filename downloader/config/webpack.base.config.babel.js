@@ -27,10 +27,7 @@ const config = {
   },
   externals: [nodeExternals()],
   resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-    alias: {
-      '@': path.join(root, 'src')
-    }
+    extensions: ['.tsx', '.ts', '.js']
   },
   plugins: [
     new Dotenv()
