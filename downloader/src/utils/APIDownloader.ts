@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 /**
- * @name Downloader
+ * @name APIDownloader
  * @description Class for downloading data from an API.
  */
-class Downloader {
+class APIDownloader {
   api: string;
   params: object;
 
@@ -26,4 +26,4 @@ class Downloader {
   }
 }
 
-export default Downloader;
+export default APIDownloader;

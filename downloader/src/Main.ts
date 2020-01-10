@@ -1,4 +1,4 @@
-import { DBInterface, Downloader } from './utils';
+import { DBInterface, APIDownloader } from './utils';
 
 /**
  * @name Main
@@ -13,7 +13,7 @@ class Main {
   }
 
   async start() {
-    const downloaders: Array<Downloader> = this.createDownloaders();
+    const downloaders: Array<APIDownloader> = this.createDownloaders();
 
     try {
       // Download data from APIs
@@ -44,14 +44,19 @@ class Main {
       const averageETH = this.getAverageQuote(quotes, 'ETH');
       const averageLTC = this.getAverageQuote(quotes, 'LTC');
       const averageXRP = this.getAverageQuote(quotes, 'XRP');
+
+      console.log(`BTC: $${averageBTC.toFixed(2)}`);
+      console.log(`ETH: $${averageETH.toFixed(2)}`);
+      console.log(`LTC: $${averageLTC.toFixed(2)}`);
+      console.log(`XRP: $${averageXRP.toFixed(2)}`);
     }
     catch (err) {
       this.shouldStoreData = false;
     }
   }
 
-  createDownloaders(): Array<Downloader> {
-    const coinMarketCapDownloader = new Downloader('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest', {
+  createDownloaders(): Array<APIDownloader> {
+    const coinMarketCapDownloader = new APIDownloader('https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest', {
       headers: {
         'X-CMC_PRO_API_KEY': process.env.coinMarketCapKey
       },
@@ -60,20 +65,20 @@ class Main {
       }
     });
 
-    const coinlayerDownloader = new Downloader('http://api.coinlayer.com/api/live', {
+    const coinlayerDownloader = new APIDownloader('http://api.coinlayer.com/api/live', {
       params: {
         access_key: process.env.coinlayerKey,
         symbols: 'BTC,ETH,LTC,XRP'
       }
     });
 
-    const coinCapDownloader = new Downloader('https://api.coincap.io/v2/assets', {
+    const coinCapDownloader = new APIDownloader('https://api.coincap.io/v2/assets', {
       params: {
         ids: 'bitcoin,ethereum,litecoin,ripple'
       }
     });
 
-    const cryptoCompareDownloader = new Downloader('https://min-api.cryptocompare.com/data/pricemulti', {
+    const cryptoCompareDownloader = new APIDownloader('https://min-api.cryptocompare.com/data/pricemulti', {
       params: {
         api_key: process.env.cryptoCompareKey,
         fsyms: 'BTC,ETH,LTC,XRP',
@@ -99,7 +104,10 @@ class Main {
     ].priceUsd.toString());
     sum += parseFloat(quotes[3][symbol].USD.toString());
 
-    return sum / 4;
+    const average: number = sum / 4;
+
+    // Truncate and return average to 2 decimal places without rounding
+    return Math.trunc(average * Math.pow(10, 2)) / Math.pow(10, 2);
   }
 }
 
