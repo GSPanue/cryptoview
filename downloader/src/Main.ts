@@ -1,4 +1,4 @@
-import { DBInterface, APIDownloader } from './utils';
+import { DBInterface, APIDownloader, TwitterDownloader } from './utils';
 
 /**
  * @name Main
@@ -14,45 +14,22 @@ class Main {
 
   async start() {
     const APIDownloaders: Array<APIDownloader> = this.createAPIDownloaders();
+    const twitterDownloader: TwitterDownloader = this.createTwitterDownloader();
+
+    let tweets: Array<Array<TweetObject>>;
+    let cryptocurrencyPrices: CryptocurrencyPriceObject;
 
     try {
-      // Download data from APIs
-      const [
-        coinMarketCapData,
-        coinlayerData,
-        coinCapData,
-        cryptoCompareData
-      ] = await Promise.all(APIDownloaders.map((APIDownloader) => {
-        return APIDownloader.getData();
-      }));
-
-      // Get quotes from data
-      const coinMarketCapQuotes = coinMarketCapData.data.data;
-      const coinlayerQuotes = coinlayerData.data.rates;
-      const coinCapQuotes = coinCapData.data.data;
-      const cryptoCompareQuotes = cryptoCompareData.data;
-
-      const quotes = [
-        coinMarketCapQuotes,
-        coinlayerQuotes,
-        coinCapQuotes,
-        cryptoCompareQuotes
-      ];
-
-      // Get averages
-      const averageBTC = this.getAverageQuote(quotes, 'BTC');
-      const averageETH = this.getAverageQuote(quotes, 'ETH');
-      const averageLTC = this.getAverageQuote(quotes, 'LTC');
-      const averageXRP = this.getAverageQuote(quotes, 'XRP');
-
-      console.log(`BTC: $${averageBTC.toFixed(2)}`);
-      console.log(`ETH: $${averageETH.toFixed(2)}`);
-      console.log(`LTC: $${averageLTC.toFixed(2)}`);
-      console.log(`XRP: $${averageXRP.toFixed(2)}`);
+      tweets = await this.getTweets(twitterDownloader);
+      cryptocurrencyPrices = await this.getCryptocurrencyPrices(APIDownloaders);
     }
-    catch (err) {
+    catch {
       this.shouldStoreData = false;
     }
+
+    /**
+     * @todo Store data in DynamoDB
+     */
   }
 
   createAPIDownloaders(): Array<APIDownloader> {
@@ -92,6 +69,91 @@ class Main {
       coinCapDownloader,
       cryptoCompareDownloader
     ];
+  }
+
+  createTwitterDownloader(): TwitterDownloader {
+    return new TwitterDownloader(
+      process.env.twitterConsumerKey,
+      process.env.twitterConsumerSecret,
+      process.env.twitterAccessTokenKey,
+      process.env.twitterAccessTokenSecret
+    );
+  }
+
+  async getTweets(twitterDownloader: TwitterDownloader): Promise<Array<Array<TweetObject>>> {
+    // Create promises
+    const tweetPromises = [
+      twitterDownloader.searchTweets('Bitcoin $BTC'),
+      twitterDownloader.searchTweets('Ethereum $ETH'),
+      twitterDownloader.searchTweets('Litecoin $LTC'),
+      twitterDownloader.searchTweets('Ripple $XRP')
+    ];
+
+    // Download data from Twitter
+    const [
+      bitcoinTwitterData,
+      ethereumTwitterData,
+      litecoinTwitterData,
+      rippleTwitterData
+    ] = await Promise.all(tweetPromises);
+
+    // Remove redundant data
+    const bitcoinTweets = this.processTwitterData(bitcoinTwitterData);
+    const ethereumTweets = this.processTwitterData(ethereumTwitterData);
+    const litecoinTweets = this.processTwitterData(litecoinTwitterData);
+    const rippleTweets = this.processTwitterData(rippleTwitterData);
+
+    return [
+      bitcoinTweets,
+      ethereumTweets,
+      litecoinTweets,
+      rippleTweets
+    ];
+  }
+
+  processTwitterData(twitterData: TwitterObject): Array<TweetObject> {
+    return twitterData.statuses.map((tweet: TweetObject) => ({
+      id: tweet.id,
+      text: tweet.text
+    }));
+  }
+
+  async getCryptocurrencyPrices(apiDownloaders: Array<APIDownloader>): Promise<CryptocurrencyPriceObject> {
+    // Download data from APIs
+    const [
+      coinMarketCapData,
+      coinlayerData,
+      coinCapData,
+      cryptoCompareData
+    ] = await Promise.all(apiDownloaders.map((apiDownloader) => {
+      return apiDownloader.getData();
+    }));
+
+    // Get quotes from data
+    const coinMarketCapQuotes = coinMarketCapData.data.data;
+    const coinlayerQuotes = coinlayerData.data.rates;
+    const coinCapQuotes = coinCapData.data.data;
+    const cryptoCompareQuotes = cryptoCompareData.data;
+
+    const quotes = [
+      coinMarketCapQuotes,
+      coinlayerQuotes,
+      coinCapQuotes,
+      cryptoCompareQuotes
+    ];
+
+    // Get averages
+    const averageBTC = this.getAverageQuote(quotes, 'BTC');
+    const averageETH = this.getAverageQuote(quotes, 'ETH');
+    const averageLTC = this.getAverageQuote(quotes, 'LTC');
+    const averageXRP = this.getAverageQuote(quotes, 'XRP');
+
+    return {
+      BTC: averageBTC,
+      ETH: averageETH,
+      LTC: averageLTC,
+      XRP: averageXRP
+    };
   }
 
   getAverageQuote(quotes: Array<any>, symbol: string): number {
