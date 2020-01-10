@@ -9,3 +9,9 @@ interface CoinCapObject {
   symbol: string;
   priceUsd: string;
 }
+
+// Tweet Object
+interface TweetObject {
+  id: number,
+  text: string
+}
