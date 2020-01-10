@@ -5,6 +5,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
+    "@babel/node": "^7.7.7",
     "@babel/preset-env": "^7.7.7",
     "@types/node": "^13.1.4",
     "aws-sdk": "^2.597.0",
