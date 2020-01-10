@@ -21,7 +21,7 @@ class TwitterDownloader {
       });
   }
 
-  async searchTweets(keyword: string): Promise<object> {
+  async searchTweets(keyword: string): Promise<TwitterObject> {
     try {
       const result = await this.client.get('search/tweets', {
         q: keyword,
