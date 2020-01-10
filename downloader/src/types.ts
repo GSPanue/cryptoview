@@ -10,6 +10,11 @@ interface CoinCapObject {
   priceUsd: string;
 }
 
+// Twitter Object
+interface TwitterObject {
+  statuses?: Array<object>
+}
+
 // Tweet Object
 interface TweetObject {
   id: number,
