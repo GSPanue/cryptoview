@@ -16,7 +16,8 @@ class Main {
     const downloaders: Array<Downloader> = this.createDownloaders();
 
     try {
-      const [coinMarketCapData, coinlayerData] = await Promise.all(downloaders.map((downloader) => {
+      // Download data from APIs
+      const [coinMarketCapData, coinlayerData, coinCapData] = await Promise.all(downloaders.map((downloader) => {
         return downloader.getData();
       }));
     }
@@ -43,7 +44,13 @@ class Main {
       }
     });
 
-    return [coinMarketCapDownloader, coinlayerDownloader];
+    const coinCapDownloader = new Downloader('https://api.coincap.io/v2/assets', {
+      params: {
+        ids: 'bitcoin,ethereum,litecoin,ripple'
+      }
+    });
+
+    return [coinMarketCapDownloader, coinlayerDownloader, coinCapDownloader];
   }
 }
 
