@@ -28,3 +28,8 @@ interface CryptocurrencyPriceObject {
   LTC: number,
   XRP: number
 }
+
+// Datum Object
+interface DatumObject {
+  id: number | string
+}
