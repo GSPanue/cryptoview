@@ -1,3 +1,4 @@
+import { v4 } from 'uuid';
 import { DBInterface, APIDownloader, TwitterDownloader } from './utils';
 
 /**
@@ -9,7 +10,7 @@ class Main {
   shouldStoreData: boolean = true;
 
   constructor() {
-    this.dbInterface = new DBInterface(process.env.username, process.env.password);
+    this.dbInterface = new DBInterface();
   }
 
   async start() {
@@ -149,6 +150,7 @@ class Main {
     const averageXRP = this.getAverageQuote(quotes, 'XRP');
 
     return {
+      id: v4(),
       BTC: averageBTC,
       ETH: averageETH,
       LTC: averageLTC,
