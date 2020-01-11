@@ -18,6 +18,7 @@ interface TwitterObject {
 // Tweet Object
 interface TweetObject {
   id: number,
+  currency: string,
   text: string
 }
 
