@@ -18,7 +18,7 @@ class DBInterface {
     this.documentClient = new AWS.DynamoDB.DocumentClient();
   }
 
-  store(table: string, data: Array<object>): void {
+  async store(table: string, data: Array<object>): Promise<any> {
     const promises = data.map((datum: DatumObject) => {
       return new Promise<string> ((resolve, reject) => {
         const params = {
@@ -37,7 +37,7 @@ class DBInterface {
       });
     });
 
-    Promise.all(promises);
+    return Promise.all(promises);
   }
 }
 
