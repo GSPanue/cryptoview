@@ -28,9 +28,20 @@ class Main {
       this.shouldStoreData = false;
     }
 
-    /**
-     * @todo Store data in DynamoDB
-     */
+    if (this.shouldStoreData) {
+      const bitcoinTweets = tweets[0];
+      const ethereumTweets = tweets[1];
+      const litecoinTweets = tweets[2];
+      const rippleTweets = tweets[3];
+
+      await Promise.all([
+        this.dbInterface.store('TwitterData', bitcoinTweets),
+        this.dbInterface.store('TwitterData', ethereumTweets),
+        this.dbInterface.store('TwitterData', litecoinTweets),
+        this.dbInterface.store('TwitterData', rippleTweets),
+        this.dbInterface.store('CryptoPrices', [cryptocurrencyPrices])
+      ]);
+    }
   }
 
   createAPIDownloaders(): Array<APIDownloader> {
@@ -99,10 +110,10 @@ class Main {
     ] = await Promise.all(tweetPromises);
 
     // Remove redundant data
-    const bitcoinTweets = this.processTwitterData(bitcoinTwitterData);
-    const ethereumTweets = this.processTwitterData(ethereumTwitterData);
-    const litecoinTweets = this.processTwitterData(litecoinTwitterData);
-    const rippleTweets = this.processTwitterData(rippleTwitterData);
+    const bitcoinTweets = this.processTwitterData(bitcoinTwitterData, 'BTC');
+    const ethereumTweets = this.processTwitterData(ethereumTwitterData, 'ETH');
+    const litecoinTweets = this.processTwitterData(litecoinTwitterData, 'LTC');
+    const rippleTweets = this.processTwitterData(rippleTwitterData, 'XRP');
 
     return [
       bitcoinTweets,
@@ -112,9 +123,10 @@ class Main {
     ];
   }
 
-  processTwitterData(twitterData: TwitterObject): Array<TweetObject> {
+  processTwitterData(twitterData: TwitterObject, currency: string): Array<TweetObject> {
     return twitterData.statuses.map((tweet: TweetObject) => ({
       id: tweet.id,
+      currency,
       text: tweet.text
     }));
   }
