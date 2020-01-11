@@ -25,7 +25,7 @@ class TwitterDownloader {
     try {
       const result = await this.client.get('search/tweets', {
         q: keyword,
-        count: 10,
+        count: 25,
         lang: 'en',
         result_type: 'recent'
       });
