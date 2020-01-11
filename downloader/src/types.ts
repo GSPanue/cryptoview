@@ -23,6 +23,7 @@ interface TweetObject {
 
 // Cryptocurrency Price Object
 interface CryptocurrencyPriceObject {
+  id: string,
   BTC: number,
   ETH: number,
   LTC: number,
