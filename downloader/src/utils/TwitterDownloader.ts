@@ -23,14 +23,14 @@ class TwitterDownloader {
 
   async searchTweets(keyword: string): Promise<TwitterObject> {
     try {
-      const result = await this.client.get('search/tweets', {
+      const response = await this.client.get('search/tweets', {
         q: keyword,
         count: 25,
         lang: 'en',
         result_type: 'recent'
       });
 
-      return result;
+      return response;
     }
     catch (error) {
       console.log('Could not get tweets.');
