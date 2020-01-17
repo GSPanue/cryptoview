@@ -13,9 +13,11 @@ class APIDownloader {
     this.params = params;
   }
 
-  async getData(): Promise<Response> {
+  async getData() {
     try {
-      return await axios.get(this.api, { ...this.params });
+      const response = await axios.get(this.api, { ...this.params });
+
+      return response.data;
     }
     catch (error) {
       console.log(`Could not get data from the following web service: ${this.api}`);
