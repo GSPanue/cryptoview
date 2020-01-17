@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 /**
- * @name APIDownloader
- * @description Class for downloading data from an API.
+ * @name NomicsDownloader
+ * @description Class for downloading data from Nomics' API.
  */
-class APIDownloader {
+class NomicsDownloader {
   api: string;
   params: object;
 
@@ -13,11 +13,16 @@ class APIDownloader {
     this.params = params;
   }
 
-  async getData() {
+  async getData(ticker: String) {
     try {
-      const response = await axios.get(this.api, { ...this.params });
+      const response = await axios.get(this.api, {
+        params: {
+          ...this.params,
+          currency: ticker
+        }
+      });
 
-      return response.data;
+      return response;
     }
     catch (error) {
       console.log(`Could not get data from the following web service: ${this.api}`);
@@ -28,4 +33,4 @@ class APIDownloader {
   }
 }
 
-export default APIDownloader;
+export default NomicsDownloader;
