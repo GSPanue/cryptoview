@@ -1,7 +1,7 @@
-<h1 align="center">CryptoWatch</h1>
+<h1 align="center">CryptoView</h1>
 
 <div align="center">
-A web application for real-time data visualisation of cryptocurrency prices
+A web application for data visualisation of cryptocurrency prices
 </div>
 
 ## Version
