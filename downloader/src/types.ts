@@ -1,13 +1,25 @@
-// API Response Object
-interface Response {
-  [key: string]: any
+// CoinGecko Object
+interface CoinGeckoObject {
+  data: {
+    prices: Array<Array<number>>
+  }
 }
 
-// CoinCap Object
-interface CoinCapObject {
-  id: string;
-  symbol: string;
-  priceUsd: string;
+// Prices Object
+interface PricesObject {
+  [index: string]: any,
+  BTC: {
+    prices?: Array<Array<number>>
+  },
+  ETH: {
+    prices?: Array<Array<number>>
+  },
+  LTC: {
+    prices?: Array<Array<number>>
+  },
+  XRP: {
+    prices?: Array<Array<number>>
+  }
 }
 
 // Twitter Object
@@ -17,21 +29,29 @@ interface TwitterObject {
 
 // Tweet Object
 interface TweetObject {
-  id: number,
-  currency: string,
   text: string
 }
 
-// Cryptocurrency Price Object
-interface CryptocurrencyPriceObject {
-  id: string,
-  BTC: number,
-  ETH: number,
-  LTC: number,
-  XRP: number
+// Tweets Object
+interface TweetsObject {
+  [index: string]: any,
+  BTC: {
+    tweets?: Array<TweetObject>
+  },
+  ETH: {
+    tweets?: Array<TweetObject>
+  },
+  LTC: {
+    tweets?: Array<TweetObject>
+  },
+  XRP: {
+    tweets?: Array<TweetObject>
+  }
 }
 
-// Datum Object
-interface DatumObject {
-  id: number | string
+// Store Object
+interface StoreObject {
+  id: string,
+  currency?: string,
+  price?: Array<number>
 }

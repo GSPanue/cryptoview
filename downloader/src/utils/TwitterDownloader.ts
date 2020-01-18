@@ -5,7 +5,7 @@ import * as Twitter from 'twitter';
  * @description Class for downloading data from Twitter.
  */
 class TwitterDownloader {
-  client: Twitter;
+  private client: Twitter;
 
   constructor(
     consumerKey: string,
@@ -21,7 +21,15 @@ class TwitterDownloader {
       });
   }
 
-  async searchTweets(keyword: string): Promise<TwitterObject> {
+  public getClient(): Twitter {
+    return this.client;
+  }
+
+  public setClient(newClient: Twitter) {
+    this.client = newClient;
+  }
+
+  public async searchTweets(keyword: string): Promise<TwitterObject> {
     try {
       const response = await this.client.get('search/tweets', {
         q: keyword,
