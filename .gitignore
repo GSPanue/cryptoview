@@ -1,4 +1,5 @@
 # CryptoView
 **/node_modules
 downloader/dist
+**/bundle.min.js
 .env
