@@ -50,16 +50,18 @@ const createWebSocketPlugin = (socket) => (
       }));
     }
 
-    socket.onmessage = ({ data: rawMessage }) => {
-      const { request, response } = JSON.parse(rawMessage);
+    socket.onmessage = ({ data: message }) => {
+      const { action, data } = JSON.parse(message);
 
-      switch (request) {
-        case 'getNumericalData':
-          handleNumericalData(store, response);
+      console.log('ACTION RECEIVED: ', action);
+
+      switch (action) {
+        case 'getNumericalData' || 'sendNumericalData':
+          handleNumericalData(store, data);
           break;
 
-        case 'getSentimentData':
-          handleSentimentData(store, response);
+        case 'getSentimentData' || 'sendSentimentData':
+          handleSentimentData(store, data);
           break;
 
         default:
