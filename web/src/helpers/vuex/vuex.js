@@ -1,6 +1,12 @@
-const sortByDate = (data) => (
+const sortNumericalDataByDate = (data) => (
   data.sort((a, b) => (
     new Date(a.data.timestamp) - new Date(b.data.timestamp)
+  ))
+);
+
+const sortSentimentDataByDate = (data) => (
+  data.sort((a, b) => (
+    new Date(a.timestamp) - new Date(b.timestamp)
   ))
 );
 
@@ -11,7 +17,14 @@ const filterByCurrency = (currency, data) => (
 );
 
 const getNewNumericalData = (currentData, newData, currency) => (
-  sortByDate([
+  sortNumericalDataByDate([
+    ...filterByCurrency(currency, currentData[currency]),
+    ...filterByCurrency(currency, newData)
+  ])
+);
+
+const getNewSentimentData = (currentData, newData, currency) => (
+  sortSentimentDataByDate([
     ...filterByCurrency(currency, currentData[currency]),
     ...filterByCurrency(currency, newData)
   ])
@@ -31,9 +44,16 @@ const handleNumericalData = (store, data) => {
 };
 
 const handleSentimentData = (store, data) => {
-  /**
-   * @todo Handle sentiment data
-   */
+  const currentSentimentData = store.getters.getSentimentData;
+
+  const newSentimentData = {
+    BTC: getNewSentimentData(currentSentimentData, data, 'BTC'),
+    ETH: getNewSentimentData(currentSentimentData, data, 'ETH'),
+    LTC: getNewSentimentData(currentSentimentData, data, 'LTC'),
+    XRP: getNewSentimentData(currentSentimentData, data, 'XRP')
+  }
+
+  store.commit('setSentimentData', newSentimentData);
 };
 
 const createWebSocketPlugin = (socket) => (
