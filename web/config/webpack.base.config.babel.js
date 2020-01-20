@@ -1,4 +1,5 @@
 import VueLoaderPlugin from 'vue-loader/lib/plugin';
+import Dotenv from 'dotenv-webpack';
 import path from 'path';
 
 const root = path.resolve(__dirname, '..');
@@ -38,7 +39,8 @@ const config = {
     }
   },
   plugins: [
-    new VueLoaderPlugin()
+    new VueLoaderPlugin(),
+    new Dotenv()
   ]
 };
 
