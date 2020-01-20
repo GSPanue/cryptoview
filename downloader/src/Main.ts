@@ -121,7 +121,8 @@ class Main {
 
   private processTwitterData(twitterData: TwitterObject): object {
     const tweets: Array<TweetObject> = twitterData.statuses.map((tweet: TweetObject) => ({
-      text: tweet.text
+      text: tweet.text,
+      timestamp: Date.parse(tweet.created_at)
     }));
 
     return {

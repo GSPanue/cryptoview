@@ -29,7 +29,9 @@ interface TwitterObject {
 
 // Tweet Object
 interface TweetObject {
-  text: string
+  text: string,
+  created_at?: string,
+  timestamp?: number
 }
 
 // Tweets Object
