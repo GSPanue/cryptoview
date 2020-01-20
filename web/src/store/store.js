@@ -16,7 +16,12 @@ const store = new Vuex.Store({
       LTC: [],
       XRP: []
     },
-    sentimentData: []
+    sentimentData: {
+      BTC: [],
+      ETH: [],
+      LTC: [],
+      XRP: []
+    }
   },
   getters: {
     getNumericalData: ({ numericalData }) => (
