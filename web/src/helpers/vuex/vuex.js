@@ -30,6 +30,16 @@ const getNewSentimentData = (currentData, newData, currency) => (
   ])
 );
 
+const getCount = (data) => {
+  let count = 0;
+
+  for (const currency in data) {
+    count += data[currency].length
+  }
+
+  return count;
+}
+
 const handleNumericalData = (store, data) => {
   const currentNumericalData = store.getters.getNumericalData;
 
@@ -40,7 +50,10 @@ const handleNumericalData = (store, data) => {
     XRP: getNewNumericalData(currentNumericalData, data, 'XRP')
   }
 
-  store.commit('setNumericalData', newNumericalData);
+  store.commit('setNumericalData', {
+    ...newNumericalData,
+    count: getCount(newNumericalData)
+  });
 };
 
 const handleSentimentData = (store, data) => {
@@ -53,7 +66,10 @@ const handleSentimentData = (store, data) => {
     XRP: getNewSentimentData(currentSentimentData, data, 'XRP')
   }
 
-  store.commit('setSentimentData', newSentimentData);
+  store.commit('setSentimentData', {
+    ...newSentimentData,
+    count: getCount(newSentimentData)
+  });
 };
 
 const createWebSocketPlugin = (socket) => (
