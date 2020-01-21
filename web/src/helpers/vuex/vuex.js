@@ -87,8 +87,15 @@ const createWebSocketPlugin = (socket) => (
       }));
     }
 
+    socket.onclose = () => {
+      console.log('[WS]: Disconnected from WebSocket');
+      store.commit('setConnected', false);
+    }
+
     socket.onmessage = ({ data: message }) => {
       const { action, data } = JSON.parse(message);
+
+      console.log(`[WS]: Received action: ${action}`);
 
       switch (action) {
         case 'getNumericalData':
