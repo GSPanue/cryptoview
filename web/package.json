@@ -4,17 +4,20 @@
     "build": "webpack -p --config ./config/webpack.prod.config.babel.js"
   },
   "dependencies": {
+    "apexcharts": "^3.15.2",
     "element-ui": "^2.13.0",
     "vue": "^2.6.11",
+    "vue-apexcharts": "^1.5.2",
     "vue-router": "^3.1.5",
     "vuex": "^3.1.2"
   },
   "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
+    "@babel/core": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.8.3",
+    "@babel/preset-env": "^7.8.3",
+    "@babel/register": "^7.8.3",
+    "babel-loader": "^8.0.6",
     "babel-plugin-component": "^1.1.1",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
     "css-loader": "^3.4.2",
     "dotenv-webpack": "^1.7.0",
     "file-loader": "^5.0.2",
