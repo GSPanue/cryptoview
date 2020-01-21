@@ -7,7 +7,12 @@
     justify="center"
     align="middle"
   >
-    <chart currency="BTC" />
+    <el-card class="chart-container">
+      <chart
+        currency="Bitcoin"
+        ticker="BTC"
+      />
+    </el-card>
   </el-row>
 </template>
 
@@ -70,5 +75,11 @@ export default {
 <style scoped>
 .container {
   height: 100%;
+}
+
+.chart-container {
+  max-width: 1000px;
+  width: 100%;
+  padding: 40px;
 }
 </style>
