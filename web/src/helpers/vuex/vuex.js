@@ -53,7 +53,7 @@ const createWebSocketPlugin = (socket) => (
 
     socket.onclose = () => {
       console.log('[WS]: Disconnected from WebSocket');
-      store.commit('setConnected', false);
+      store.commit('reset');
     }
 
     socket.onmessage = ({ data: message }) => {
