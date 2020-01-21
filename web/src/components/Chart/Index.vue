@@ -120,6 +120,7 @@ export default {
 .chart {
   max-width: 1000px;
   width: 100%;
+  padding-left: 23px;
 }
 
 div >>> .apexcharts-toolbar {
