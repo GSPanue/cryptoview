@@ -8,24 +8,26 @@ Vue.use(Vuex);
 const socket = createWebSocket();
 const webSocketPlugin = createWebSocketPlugin(socket);
 
-const store = new Vuex.Store({
-  state: {
-    connected: false,
-    numericalData: {
-      BTC: [],
-      ETH: [],
-      LTC: [],
-      XRP: [],
-      count: 0
-    },
-    sentimentData: {
-      BTC: [],
-      ETH: [],
-      LTC: [],
-      XRP: [],
-      count: 0
-    }
+const initialState = () => ({
+  connected: false,
+  numericalData: {
+    BTC: [],
+    ETH: [],
+    LTC: [],
+    XRP: [],
+    count: 0
   },
+  sentimentData: {
+    BTC: [],
+    ETH: [],
+    LTC: [],
+    XRP: [],
+    count: 0
+  }
+});
+
+const store = new Vuex.Store({
+  state: initialState,
   getters: {
     getConnected: ({ connected }) => (
       connected
@@ -46,6 +48,13 @@ const store = new Vuex.Store({
     },
     setSentimentData: (store, newSentimentData) => {
       store.sentimentData = newSentimentData;
+    },
+    reset: (store) => {
+      const state = initialState();
+
+      Object.keys(state).forEach((key) => {
+        store[key] = state[key]
+      });
     }
   },
   plugins: [webSocketPlugin]
