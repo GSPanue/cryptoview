@@ -10,6 +10,7 @@ const webSocketPlugin = createWebSocketPlugin(socket);
 
 const store = new Vuex.Store({
   state: {
+    connected: false,
     numericalData: {
       BTC: [],
       ETH: [],
@@ -24,6 +25,9 @@ const store = new Vuex.Store({
     }
   },
   getters: {
+    getConnected: ({ connected }) => (
+      connected
+    ),
     getNumericalData: ({ numericalData }) => (
       numericalData
     ),
@@ -32,6 +36,9 @@ const store = new Vuex.Store({
     )
   },
   mutations: {
+    setConnected: (store, newConnected) => {
+      store.connected = newConnected;
+    },
     setNumericalData: (store, newNumericalData) => {
       store.numericalData = newNumericalData;
     },
