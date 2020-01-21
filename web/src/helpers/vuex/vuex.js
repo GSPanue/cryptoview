@@ -1,58 +1,22 @@
-const sortNumericalDataByDate = (data) => (
-  data.sort((a, b) => (
-    new Date(a.data.timestamp) - new Date(b.data.timestamp)
-  ))
-);
-
-const sortSentimentDataByDate = (data) => (
-  data.sort((a, b) => (
-    new Date(a.timestamp) - new Date(b.timestamp)
-  ))
-);
-
-const filterByCurrency = (currency, data) => (
-  data.filter((datum) => (
-    datum.currency === currency
-  ))
-);
-
-const getNewNumericalData = (currentData, newData, currency) => (
-  sortNumericalDataByDate([
-    ...filterByCurrency(currency, currentData[currency]),
-    ...filterByCurrency(currency, newData)
-  ])
-);
-
-const getNewSentimentData = (currentData, newData, currency) => (
-  sortSentimentDataByDate([
-    ...filterByCurrency(currency, currentData[currency]),
-    ...filterByCurrency(currency, newData)
-  ])
-);
-
-const getCount = (data) => {
-  let count = 0;
-
-  for (const currency in data) {
-    count += data[currency].length
-  }
-
-  return count;
-}
+import {
+  createNewNumericalData,
+  createNewSentimentData,
+  countData
+} from '@/helpers';
 
 const handleNumericalData = (store, data) => {
   const currentNumericalData = store.getters.getNumericalData;
 
   const newNumericalData = {
-    BTC: getNewNumericalData(currentNumericalData, data, 'BTC'),
-    ETH: getNewNumericalData(currentNumericalData, data, 'ETH'),
-    LTC: getNewNumericalData(currentNumericalData, data, 'LTC'),
-    XRP: getNewNumericalData(currentNumericalData, data, 'XRP')
+    BTC: createNewNumericalData(currentNumericalData, data, 'BTC'),
+    ETH: createNewNumericalData(currentNumericalData, data, 'ETH'),
+    LTC: createNewNumericalData(currentNumericalData, data, 'LTC'),
+    XRP: createNewNumericalData(currentNumericalData, data, 'XRP')
   }
 
   store.commit('setNumericalData', {
     ...newNumericalData,
-    count: getCount(newNumericalData)
+    count: countData(newNumericalData)
   });
 };
 
@@ -60,15 +24,15 @@ const handleSentimentData = (store, data) => {
   const currentSentimentData = store.getters.getSentimentData;
 
   const newSentimentData = {
-    BTC: getNewSentimentData(currentSentimentData, data, 'BTC'),
-    ETH: getNewSentimentData(currentSentimentData, data, 'ETH'),
-    LTC: getNewSentimentData(currentSentimentData, data, 'LTC'),
-    XRP: getNewSentimentData(currentSentimentData, data, 'XRP')
+    BTC: createNewSentimentData(currentSentimentData, data, 'BTC'),
+    ETH: createNewSentimentData(currentSentimentData, data, 'ETH'),
+    LTC: createNewSentimentData(currentSentimentData, data, 'LTC'),
+    XRP: createNewSentimentData(currentSentimentData, data, 'XRP')
   }
 
   store.commit('setSentimentData', {
     ...newSentimentData,
-    count: getCount(newSentimentData)
+    count: countData(newSentimentData)
   });
 };
 
