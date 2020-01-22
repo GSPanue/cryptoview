@@ -15,7 +15,7 @@ import { mapGetters } from 'vuex';
 export default {
   props: [
     'height',
-    'currency'
+    'ticker'
   ],
   components: {
     VueApexCharts
@@ -30,9 +30,9 @@ export default {
       return (height) ? height: 350;
     },
     createSeries() {
-      const { currency } = this;
+      const { ticker } = this;
       const numericalData = this.getNumericalData;
-      const currencyData = numericalData[currency];
+      const currencyData = numericalData[ticker].data;
 
       return [{
         name: 'Price (USD)',
@@ -40,9 +40,9 @@ export default {
       }];
     },
     createOptions() {
-      const { currency } = this;
+      const { ticker } = this;
       const numericalData = this.getNumericalData;
-      const currencyData = numericalData[currency];
+      const currencyData = numericalData[ticker].data;
 
       return {
         chart: {
