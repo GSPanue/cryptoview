@@ -1,18 +1,20 @@
 <template>
-  <el-row
-    v-if="isReady"
-    class="container"
-    type="flex"
-    flexDirection="row"
-    justify="center"
-    align="middle"
-  >
-    <el-card class="chart-container">
-      <chart
-        currency="Bitcoin"
-        ticker="BTC"
-      />
-    </el-card>
+  <el-row v-if="isReady" class="container" type="flex" flexDirection="row" justify="center" align="middle">
+    <el-col>
+      <!-- Cryptocurrency Chart -->
+      <el-row type="flex" flexDirection="row" justify="center">
+        <el-card class="chart-container">
+          <chart :name="getSelected.name" :ticker="getSelected.ticker" />
+        </el-card>
+      </el-row>
+      <div class="spacer" />
+      <!-- Cryptocurrency Table -->
+      <el-row type="flex" flexDirection="row" justify="center">
+        <el-card class="table-container">
+          <crypto-table :selected="getSelected.ticker" />
+        </el-card>
+      </el-row>
+    </el-col>
   </el-row>
 </template>
 
@@ -29,6 +31,7 @@ export default {
   computed: {
     ...mapGetters([
       'getConnected',
+      'getSelected',
       'getNumericalData',
       'getSentimentData'
     ]),
@@ -36,13 +39,28 @@ export default {
       const numericalData = this.getNumericalData;
       const sentimentData = this.getSentimentData;
 
-      return (numericalData.count > 0 && sentimentData.count > 0);
+      if (numericalData && sentimentData) {
+        return (numericalData.count > 0 && sentimentData.count > 0);
+      }
+
+      return false;
     }
   },
   methods: {
     ...mapMutations([
+      'setSelected',
       'reset'
     ]),
+    setDefaultSelected() {
+      const numericalData = this.getNumericalData;
+      const currencies = Object.keys(numericalData);
+      const { name, ticker } = numericalData[currencies[0]];
+
+      this.setSelected({
+        name,
+        ticker
+      });
+    }
   },
   watch: {
     getConnected(nextConnected, prevConnected) {
@@ -65,6 +83,7 @@ export default {
     },
     isReady(nextIsReady, prevIsReady) {
       if (nextIsReady) {
+        this.setDefaultSelected();
         loadingInstance.close();
       }
     }
@@ -81,5 +100,16 @@ export default {
   max-width: 1000px;
   width: 100%;
   padding: 40px;
+}
+
+.table-container {
+  max-width: 1000px;
+  width: 100%;
+  padding: 10px 40px;
+}
+
+.spacer {
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 </style>
