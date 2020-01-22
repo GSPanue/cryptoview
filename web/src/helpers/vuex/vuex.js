@@ -1,18 +1,25 @@
 import {
+  getCryptocurrencies,
   createNewNumericalData,
   createNewSentimentData,
   countData
 } from '@/helpers';
 
 const handleNumericalData = (store, data) => {
+  const cryptocurrencies = getCryptocurrencies(data);
   const currentNumericalData = store.getters.getNumericalData;
 
-  const newNumericalData = {
-    BTC: createNewNumericalData(currentNumericalData, data, 'BTC'),
-    ETH: createNewNumericalData(currentNumericalData, data, 'ETH'),
-    LTC: createNewNumericalData(currentNumericalData, data, 'LTC'),
-    XRP: createNewNumericalData(currentNumericalData, data, 'XRP')
-  }
+  let newNumericalData = {};
+
+  cryptocurrencies.map((currency) => {
+    const { name, ticker } = currency;
+
+    newNumericalData[ticker] = {
+      ...createNewNumericalData(currentNumericalData, data, ticker),
+      name,
+      ticker
+    };
+  });
 
   store.commit('setNumericalData', {
     ...newNumericalData,
@@ -21,14 +28,20 @@ const handleNumericalData = (store, data) => {
 };
 
 const handleSentimentData = (store, data) => {
+  const cryptocurrencies = getCryptocurrencies(data);
   const currentSentimentData = store.getters.getSentimentData;
 
-  const newSentimentData = {
-    BTC: createNewSentimentData(currentSentimentData, data, 'BTC'),
-    ETH: createNewSentimentData(currentSentimentData, data, 'ETH'),
-    LTC: createNewSentimentData(currentSentimentData, data, 'LTC'),
-    XRP: createNewSentimentData(currentSentimentData, data, 'XRP')
-  }
+  let newSentimentData = {};
+
+  cryptocurrencies.map((currency) => {
+    const { name, ticker } = currency;
+
+    newSentimentData[ticker] = {
+      ...createNewSentimentData(currentSentimentData, data, ticker),
+      name,
+      ticker
+    };
+  });
 
   store.commit('setSentimentData', {
     ...newSentimentData,

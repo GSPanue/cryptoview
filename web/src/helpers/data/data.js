@@ -1,3 +1,25 @@
+const getCryptocurrencies = (data) => {
+  const seen = new Set();
+  const allCryptocurrencies = data.map((datum) => ({
+    name: datum.name,
+    ticker: datum.ticker
+  }));
+
+  const uniqueCryptocurrencies = allCryptocurrencies.filter((cryptocurrency) => {
+    const duplicate = seen.has(cryptocurrency.name)
+    seen.add(cryptocurrency.name);
+
+    return !duplicate;
+  });
+
+  return uniqueCryptocurrencies.sort((a, b) => {
+    const nameA = a.name.toLowerCase();
+    const nameB = b.name.toLowerCase();
+
+    return (nameA === nameB) ? 0 : ((nameA < nameB) ? -1 : 1)
+  });
+}
+
 const sortNumericalDataByDate = (data) => (
   data.sort((a, b) => (
     new Date(a.data.timestamp) - new Date(b.data.timestamp)
@@ -10,40 +32,68 @@ const sortSentimentDataByDate = (data) => (
   ))
 );
 
-const filterByCurrency = (currency, data) => (
+const filterByTicker = (ticker, data) => (
   data.filter((datum) => (
-    datum.currency === currency
+    datum.ticker === ticker
   ))
 );
 
-const createNewNumericalData = (currentData, newData, currency) => (
-  sortNumericalDataByDate([
-    ...filterByCurrency(currency, currentData[currency]),
-    ...filterByCurrency(currency, newData)
-  ])
+const hasData = (data) => (
+  data !== null
 );
 
-const createNewSentimentData = (currentData, newData, currency) => (
-  sortSentimentDataByDate([
-    ...filterByCurrency(currency, currentData[currency]),
-    ...filterByCurrency(currency, newData)
-  ])
-);
+const createNewNumericalData = (currentData, newData, ticker) => {
+  let data;
+
+  if (hasData(currentData)) {
+    data = sortNumericalDataByDate([
+      ...filterByTicker(ticker, currentData[ticker].data),
+      ...filterByTicker(ticker, newData)
+    ]);
+  }
+  else {
+    data = filterByTicker(ticker, newData);
+  }
+
+  return {
+    data
+  };
+}
+
+const createNewSentimentData = (currentData, newData, ticker) => {
+  let data;
+
+  if (hasData(currentData)) {
+    data = sortSentimentDataByDate([
+      ...filterByTicker(ticker, currentData[ticker].data),
+      ...filterByTicker(ticker, newData)
+    ]);
+  }
+  else {
+    data = filterByTicker(ticker, newData);
+  }
+
+  return {
+    data
+  };
+};
 
 const countData = (data) => {
   let count = 0;
 
   for (const currency in data) {
-    count += data[currency].length
+    count += data[currency].data.length
   }
 
   return count;
 };
 
 export {
+  getCryptocurrencies,
   sortNumericalDataByDate,
   sortSentimentDataByDate,
-  filterByCurrency,
+  filterByTicker,
+  hasData,
   createNewNumericalData,
   createNewSentimentData,
   countData
