@@ -11,20 +11,8 @@ const webSocketPlugin = createWebSocketPlugin(socket);
 const initialState = () => ({
   connected: false,
   selected: null,
-  numericalData: {
-    BTC: [],
-    ETH: [],
-    LTC: [],
-    XRP: [],
-    count: 0
-  },
-  sentimentData: {
-    BTC: [],
-    ETH: [],
-    LTC: [],
-    XRP: [],
-    count: 0
-  }
+  numericalData: null,
+  sentimentData: null
 });
 
 const store = new Vuex.Store({
