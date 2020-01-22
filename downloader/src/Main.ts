@@ -30,7 +30,8 @@ class Main {
 
       console.log('Successfully stored prices and tweets.');
     }
-    catch {
+    catch(error) {
+      console.log(error);
       console.log('Program terminating...');
       return;
     }
@@ -75,10 +76,26 @@ class Main {
     const ripplePrices = this.processCoinGeckoData(coinGeckoRippleData);
 
     return {
-      BTC: bitcoinPrices,
-      ETH: ethereumPrices,
-      LTC: litecoinPrices,
-      XRP: ripplePrices
+      BTC: {
+        name: 'Bitcoin',
+        ticker: 'BTC',
+        prices: bitcoinPrices
+      },
+      ETH: {
+        name: 'Ethereum',
+        ticker: 'ETH',
+        prices: ethereumPrices
+      },
+      LTC: {
+        name: 'Litecoin',
+        ticker: 'LTC',
+        prices: litecoinPrices
+      },
+      XRP: {
+        name: 'Ripple',
+        ticker: 'XRP',
+        prices: ripplePrices
+      }
     };
   }
 
@@ -106,17 +123,31 @@ class Main {
     const rippleTweets = this.processTwitterData(twitterRippleData);
 
     return {
-      BTC: bitcoinTweets,
-      ETH: ethereumTweets,
-      LTC: litecoinTweets,
-      XRP: rippleTweets
+      BTC: {
+        name: 'Bitcoin',
+        ticker: 'BTC',
+        ...bitcoinTweets,
+      },
+      ETH: {
+        name: 'Ethereum',
+        ticker: 'ETH',
+        ...ethereumTweets,
+      },
+      LTC: {
+        name: 'Litecoin',
+        ticker: 'LTC',
+        ...litecoinTweets,
+      },
+      XRP: {
+        name: 'Ripple',
+        ticker: 'XRP',
+        ...rippleTweets
+      }
     };
   }
 
-  private processCoinGeckoData(coinGeckoData: CoinGeckoObject): object {
-    return {
-      prices: coinGeckoData.data.prices
-    };
+  private processCoinGeckoData(coinGeckoData: CoinGeckoObject): Array<Array<number>> {
+    return coinGeckoData.data.prices;
   }
 
   private processTwitterData(twitterData: TwitterObject): object {
@@ -132,13 +163,14 @@ class Main {
 
   private storePriceData(prices: PricesObject) {
     // Merge and flatten price data
-    const mergedData = [].concat.apply([], Object.keys(prices).map((currency) => {
-      const cryptocurrency = prices[currency];
+    const mergedData = [].concat.apply([], Object.keys(prices).map((ticker) => {
+      const list = prices[ticker];
 
-      return cryptocurrency.prices.map((price: Array<number>) => {
+      return list.prices.map((price: Array<number>) => {
         return {
           id: v4(),
-          currency,
+          name: list.name,
+          ticker,
           data: {
             timestamp: price[0],
             price: price[1]
@@ -153,13 +185,14 @@ class Main {
   }
 
   private storeTweetData(tweets: TweetsObject) {
-    const mergedData = [].concat.apply([], Object.keys(tweets).map((currency) => {
-      const cryptocurrency = tweets[currency];
+    const mergedData = [].concat.apply([], Object.keys(tweets).map((ticker) => {
+      const list = tweets[ticker];
 
-      return cryptocurrency.tweets.map((tweet: TweetObject) => {
+      return list.tweets.map((tweet: TweetObject) => {
         return {
           id: v4(),
-          currency,
+          name: list.name,
+          ticker,
           ...tweet
         };
       });

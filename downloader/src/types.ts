@@ -9,15 +9,23 @@ interface CoinGeckoObject {
 interface PricesObject {
   [index: string]: any,
   BTC: {
+    name: string,
+    ticker: string,
     prices?: Array<Array<number>>
   },
   ETH: {
+    name: string,
+    ticker: string,
     prices?: Array<Array<number>>
   },
   LTC: {
+    name: string,
+    ticker: string,
     prices?: Array<Array<number>>
   },
   XRP: {
+    name: string,
+    ticker: string,
     prices?: Array<Array<number>>
   }
 }
@@ -38,15 +46,23 @@ interface TweetObject {
 interface TweetsObject {
   [index: string]: any,
   BTC: {
+    name: string,
+    ticker: string,
     tweets?: Array<TweetObject>
   },
   ETH: {
+    name: string,
+    ticker: string,
     tweets?: Array<TweetObject>
   },
   LTC: {
+    name: string,
+    ticker: string,
     tweets?: Array<TweetObject>
   },
   XRP: {
+    name: string,
+    ticker: string,
     tweets?: Array<TweetObject>
   }
 }
