@@ -78,14 +78,14 @@ const createNewSentimentData = (currentData, newData, ticker) => {
   };
 };
 
-const countData = (data) => {
-  let count = 0;
+const countData = ({ count, ...data}) => {
+  let totalCount = 0;
 
   for (const currency in data) {
-    count += data[currency].data.length
+    totalCount += data[currency].data.length
   }
 
-  return count;
+  return totalCount;
 };
 
 export {
