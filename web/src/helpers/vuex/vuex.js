@@ -2,7 +2,9 @@ import {
   getCryptocurrencies,
   createNewNumericalData,
   createNewSentimentData,
-  countData
+  countData,
+  hasData,
+  combineDataObject
 } from '@/helpers';
 
 const handleNumericalData = (store, data) => {
@@ -21,9 +23,14 @@ const handleNumericalData = (store, data) => {
     };
   });
 
+  const nextNumericalData = {
+    ...hasData(currentNumericalData) && currentNumericalData,
+    ...newNumericalData
+  };
+
   store.commit('setNumericalData', {
-    ...newNumericalData,
-    count: countData(newNumericalData)
+    ...nextNumericalData,
+    count: countData(nextNumericalData)
   });
 };
 
@@ -43,9 +50,14 @@ const handleSentimentData = (store, data) => {
     };
   });
 
+  const nextSentimentData = {
+    ...hasData(currentSentimentData) && currentSentimentData,
+    ...newSentimentData
+  };
+
   store.commit('setSentimentData', {
-    ...newSentimentData,
-    count: countData(newSentimentData)
+    ...nextSentimentData,
+    count: countData(nextSentimentData)
   });
 };
 
