@@ -97,15 +97,15 @@ export default {
 }
 
 .chart-container {
-  max-width: 1000px;
+  max-width: 800px;
   width: 100%;
-  padding: 40px;
+  padding: 20px;
 }
 
 .table-container {
-  max-width: 1000px;
+  max-width: 800px;
   width: 100%;
-  padding: 10px 40px;
+  padding: 0px 20px;
 }
 
 .spacer {
