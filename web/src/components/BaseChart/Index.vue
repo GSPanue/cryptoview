@@ -27,7 +27,7 @@ export default {
     createHeight() {
       const { height } = this;
 
-      return (height) ? height: 350;
+      return (height) ? height: 300;
     },
     createSeries() {
       const { ticker } = this;
@@ -118,7 +118,7 @@ export default {
 
 <style scoped>
 .chart {
-  max-width: 1000px;
+  max-width: 800px;
   width: 100%;
   padding-left: 11px;
 }
