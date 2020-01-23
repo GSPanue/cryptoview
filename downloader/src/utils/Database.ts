@@ -116,64 +116,6 @@ class Database {
 
     return (await response).Count > 0;
   }
-
-  /**
-   * @todo Remove this method before submission of coursework
-   */
-  public async clearTables() {
-    const pricesData = (await this.documentClient.scan({
-      TableName: 'prices',
-      ProjectionExpression: '#id',
-      ExpressionAttributeNames: {
-        '#id': 'id'
-      }
-    }).promise()).Items;
-
-    const tweetsData = (await this.documentClient.scan({
-      TableName: 'tweets',
-      ProjectionExpression: '#id',
-      ExpressionAttributeNames: {
-        '#id': 'id'
-      }
-    }).promise()).Items;
-
-    const sentimentsData = (await this.documentClient.scan({
-      TableName: 'sentiments',
-      ProjectionExpression: '#id',
-      ExpressionAttributeNames: {
-        '#id': 'id'
-      }
-    }).promise()).Items;
-
-    Promise.all(pricesData.map(async ({ id }) => {
-      return await this.documentClient.delete({
-        TableName: 'prices',
-        Key: {
-          id
-        }
-      }).promise();
-    }));
-
-    Promise.all(sentimentsData.map(async ({ id }) => {
-      return await this.documentClient.delete({
-        TableName: 'sentiments',
-        Key: {
-          'id': id
-        }
-      }).promise();
-    }));
-
-    Promise.all(tweetsData.map(async ({ id }) => {
-      return await this.documentClient.delete({
-        TableName: 'tweets',
-        Key: {
-          'id': id
-        }
-      }).promise();
-    }));
-
-    return Promise.resolve();
-  }
 }
 
 export default Database;
