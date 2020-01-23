@@ -1,6 +1,13 @@
 <template>
-  <el-table ref="table" class="table" :data="createTableData" highlight-current-row @current-change="handleCurrentChange">
-    <el-table-column style="cursor: pointer" property="name" label="Name" />
+  <el-table
+    ref="table"
+    class="table"
+    :data="createTableData"
+    highlight-current-row
+    @current-change="handleCurrentChange"
+    :row-class-name="createClassName"
+  >
+    <el-table-column class="test" property="name" label="Name" />
     <el-table-column property="ticker" label="Ticker" />
     <el-table-column property="latestPrice" label="Latest Price" />
     <el-table-column property="sentiment" label="Sentiment" />
@@ -84,6 +91,11 @@ export default {
         name,
         ticker
       });
+    },
+    createClassName({ row: { ticker } }) {
+      const { ticker: selectedTicker } = this.getSelected;
+
+      return (ticker === selectedTicker) ? 'selected' : '';
     }
   },
   watch: {
@@ -102,5 +114,10 @@ export default {
 <style scoped>
 .table >>> .el-table__row {
   cursor: pointer;
+  user-select: none;
+}
+
+.el-table >>> .selected {
+  font-weight: bold;
 }
 </style>
