@@ -16,19 +16,80 @@ class Main {
     const coinGeckoDownloader: CoinGeckoDownloader = this.createCoinGeckoDownloader();
     const twitterDownloader: TwitterDownloader = this.createTwitterDownloader();
 
-    let prices: PricesObject;
-    let tweets: TweetsObject;
-
     try {
-      prices = await this.getPrices(coinGeckoDownloader);
-      tweets = await this.getTweets(twitterDownloader);
+      console.log('Checking if price and tweet data exist...');
 
-      await Promise.all([
-        this.storePriceData(prices),
-        this.storeTweetData(tweets)
-      ]);
+      // Check if price and tweet data exist
+      const hasNoPrices = await this.database.isEmpty('prices');
+      const hasNoTweets = await this.database.isEmpty('tweets');
 
-      console.log('Successfully stored prices and tweets.');
+      console.log('Check complete.\n');
+
+      // Download missing data
+      if (hasNoPrices || hasNoTweets) {
+        const shouldDownloadAll: boolean = hasNoPrices && hasNoTweets;
+        const logString: string = ((shouldDownloadAll) ? 'price and tweet' : ((hasNoPrices) ? 'price' : 'tweet'));
+
+        console.log(`Downloading initial ${logString} data...`);
+
+        // Get price data from 1 year ago
+        const priceFrom: number = this.getTimestampInSeconds(this.subtractDaysFromDate(new Date(), 365));
+        const priceTo: number = this.getTimestampInSeconds(new Date());
+
+        const prices: PricesObject = await this.getPrices(coinGeckoDownloader, priceFrom, priceTo);
+        const tweets: TweetsObject = await this.getTweets(twitterDownloader);
+
+        console.log(`Downloaded initial ${logString} data.\n`);
+        console.log(`Storing initial ${logString} data...`);
+
+        await Promise.all([
+          (hasNoPrices) && this.storePriceData(prices),
+          (hasNoTweets) && this.storeTweetData(tweets)
+        ]);
+
+        console.log(`Stored initial ${logString} data.\n`);
+      }
+
+      console.log('Started loop with 10s delay.\n');
+
+      // Download new data every 10 seconds
+      setInterval(async () => {
+        console.log('Obtaining most recent price timestamp...');
+
+        const nextTimestamp: number = await this.getNextTimestamp(['BTC', 'ETH', 'LTC', 'XRP']);
+
+        console.log('Obtained most recent price timestamp.\n');
+        console.log('Downloading new price and tweet data...');
+
+        // Get price data from the last timestamp
+        const priceFrom: number = this.getTimestampInSeconds(new Date(nextTimestamp));
+        const priceTo: number = this.getTimestampInSeconds(new Date());
+
+        const prices: PricesObject = await this.getPrices(coinGeckoDownloader, priceFrom, priceTo);
+        const tweets: TweetsObject = await this.getTweets(twitterDownloader);
+
+        console.log('Downloaded new price and tweet data.\n');
+        console.log('Storing new price and tweet data...');
+
+        const [newPriceData, newTweetData] = await Promise.all([
+          this.storePriceData(prices),
+          this.storeTweetData(tweets)
+        ]);
+
+        const hasNewPriceAndTweetData: boolean = (newPriceData.length > 0 && newTweetData.length > 0);
+        const hasNewData: boolean = (newPriceData.length > 0 || newTweetData.length > 0);
+        const hasNewPriceData: boolean = newPriceData.length > 0;
+
+        if (hasNewPriceAndTweetData) {
+          console.log('Stored new price and tweet data.\n');
+        }
+        else {
+          console.log(
+            (hasNewData) ? `Stored new ${(hasNewPriceData) ? 'price' : 'tweet'} data.\n` :
+            'No new data was stored.\n'
+          );
+        }
+      }, 10000);
     }
     catch(error) {
       console.log(error);
@@ -39,7 +100,7 @@ class Main {
 
   private createCoinGeckoDownloader(): CoinGeckoDownloader {
     return new CoinGeckoDownloader(
-      'https://api.coingecko.com/api/v3/coins/:id/market_chart'
+      'https://api.coingecko.com/api/v3/coins/:id/market_chart/range'
     );
   }
 
@@ -52,13 +113,13 @@ class Main {
     );
   }
 
-  private async getPrices(coinGeckoDownloader: CoinGeckoDownloader): Promise<PricesObject> {
+  private async getPrices(coinGeckoDownloader: CoinGeckoDownloader, from: number, to: number): Promise<PricesObject> {
     // Create promises
     const cryptocurrencyPromises = [
-      coinGeckoDownloader.getData('bitcoin'),
-      coinGeckoDownloader.getData('ethereum'),
-      coinGeckoDownloader.getData('litecoin'),
-      coinGeckoDownloader.getData('ripple')
+      coinGeckoDownloader.getData('bitcoin', from, to),
+      coinGeckoDownloader.getData('ethereum', from, to),
+      coinGeckoDownloader.getData('litecoin', from, to),
+      coinGeckoDownloader.getData('ripple', from, to)
     ];
 
     // Download data from CoinGecko API
@@ -161,14 +222,15 @@ class Main {
     };
   }
 
-  private storePriceData(prices: PricesObject) {
+  private async storePriceData(prices: PricesObject) {
     // Merge and flatten price data
-    const mergedData = [].concat.apply([], Object.keys(prices).map((ticker) => {
+    let mergedData = [].concat.apply([], Object.keys(prices).map((ticker) => {
       const list = prices[ticker];
 
       return list.prices.map((price: Array<number>) => {
         return {
           id: v4(),
+          timestamp: price[0],
           name: list.name,
           ticker,
           data: {
@@ -179,13 +241,19 @@ class Main {
       });
     }));
 
-    return Promise.all(mergedData.map((data: StoreObject) => {
+    const uniqueData = (await Promise.all(mergedData.map(async (data: StoreObject) => {
+      const exists: boolean = await this.database.priceExists(data);
+
+      return (!exists) && data;
+    }))).filter(Boolean);
+
+    return Promise.all(uniqueData.map((data: StoreObject) => {
       return this.database.store(data, 'prices');
     }));
   }
 
-  private storeTweetData(tweets: TweetsObject) {
-    const mergedData = [].concat.apply([], Object.keys(tweets).map((ticker) => {
+  private async storeTweetData(tweets: TweetsObject) {
+    let mergedData = [].concat.apply([], Object.keys(tweets).map((ticker) => {
       const list = tweets[ticker];
 
       return list.tweets.map((tweet: TweetObject) => {
@@ -198,9 +266,47 @@ class Main {
       });
     }));
 
-    return Promise.all(mergedData.map((data: StoreObject) => {
+    const uniqueData = (await Promise.all(mergedData.map(async (data: StoreObject) => {
+      const exists: boolean = await this.database.tweetExists(data);
+
+      return (!exists) && data;
+    }))).filter(Boolean);
+
+    return Promise.all(uniqueData.map((data: StoreObject) => {
       return this.database.store(data, 'tweets');
     }));
+  }
+
+  private async getNextTimestamp(tickers: Array<string>) {
+    return this.findMode(await Promise.all(tickers.map((ticker: string) => (
+      this.database.findLatestTimestamp(ticker)
+    ))));
+  }
+
+  private subtractDaysFromDate(date: Date, days: number): Date {
+    date.setDate(date.getDate() - days);
+
+    return date;
+  }
+
+  private getTimestampInSeconds(date: Date): number {
+    return Math.floor(+date / 1000);
+  }
+
+  private findMode(numbers: Array<number>): number {
+    let counted: any = numbers.reduce((acc: any, curr) => {
+        if (curr in acc) {
+            acc[curr]++;
+        } else {
+            acc[curr] = 1;
+        }
+
+        return acc;
+    }, {});
+
+    let mode: string = Object.keys(counted).reduce((a, b) => counted[a] > counted[b] ? a : b);
+
+    return Number(mode);
   }
 }
 

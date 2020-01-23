@@ -19,12 +19,13 @@ class CoinGeckoDownloader {
     this.api = newApi;
   }
 
-  public async getData(currency: string) {
+  public async getData(currency: string, from: number, to: number) {
     try {
       const response = await axios.get(this.api.replace(':id', currency), {
         params: {
           vs_currency: 'usd',
-          days: '365'
+          from,
+          to
         }
       });
 

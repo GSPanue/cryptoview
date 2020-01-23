@@ -45,6 +45,135 @@ class Database {
 
     return promise;
   }
+
+  public async isEmpty(table: string) {
+    const response = await this.documentClient.scan({
+      TableName: table,
+      Limit: 1
+    }).promise();
+
+    return response.Count === 0;
+  }
+
+  public async findLatestTimestamp(ticker: string) {
+    const response = this.documentClient.query({
+      TableName: 'prices',
+      IndexName: 'ticker-timestamp-index',
+      ProjectionExpression: '#ts',
+      KeyConditionExpression: 'ticker = :tckr and #ts < :ts',
+      ExpressionAttributeNames: {
+        '#ts': 'timestamp'
+      },
+      ExpressionAttributeValues: {
+        ':tckr': ticker,
+        ':ts': + new Date()
+      },
+      ScanIndexForward: false,
+      Limit: 1
+    }).promise();
+
+    return (await response).Items[0].timestamp;
+  }
+
+  public async priceExists(data: StoreObject) {
+    const { ticker, data: { timestamp } } = data;
+
+    const response = this.documentClient.query({
+      TableName: 'prices',
+      IndexName: 'ticker-timestamp-index',
+      ProjectionExpression: '#ts',
+      KeyConditionExpression: 'ticker = :tckr and #ts = :ts',
+      ExpressionAttributeNames: {
+        '#ts': 'timestamp'
+      },
+      ExpressionAttributeValues: {
+        ':tckr': ticker,
+        ':ts': + timestamp
+      },
+      Limit: 1
+    }).promise();
+
+    return (await response).Count > 0;
+  }
+
+  public async tweetExists(data: StoreObject) {
+    const { ticker, timestamp } = data;
+
+    const response = this.documentClient.query({
+      TableName: 'tweets',
+      IndexName: 'ticker-timestamp-index',
+      ProjectionExpression: '#ts',
+      KeyConditionExpression: 'ticker = :tckr and #ts = :ts',
+      ExpressionAttributeNames: {
+        '#ts': 'timestamp'
+      },
+      ExpressionAttributeValues: {
+        ':tckr': ticker,
+        ':ts': + timestamp
+      },
+      Limit: 1
+    }).promise();
+
+    return (await response).Count > 0;
+  }
+
+  /**
+   * @todo Remove this method before submission of coursework
+   */
+  public async clearTables() {
+    const pricesData = (await this.documentClient.scan({
+      TableName: 'prices',
+      ProjectionExpression: '#id',
+      ExpressionAttributeNames: {
+        '#id': 'id'
+      }
+    }).promise()).Items;
+
+    const tweetsData = (await this.documentClient.scan({
+      TableName: 'tweets',
+      ProjectionExpression: '#id',
+      ExpressionAttributeNames: {
+        '#id': 'id'
+      }
+    }).promise()).Items;
+
+    const sentimentsData = (await this.documentClient.scan({
+      TableName: 'sentiments',
+      ProjectionExpression: '#id',
+      ExpressionAttributeNames: {
+        '#id': 'id'
+      }
+    }).promise()).Items;
+
+    Promise.all(pricesData.map(async ({ id }) => {
+      return await this.documentClient.delete({
+        TableName: 'prices',
+        Key: {
+          id
+        }
+      }).promise();
+    }));
+
+    Promise.all(sentimentsData.map(async ({ id }) => {
+      return await this.documentClient.delete({
+        TableName: 'sentiments',
+        Key: {
+          'id': id
+        }
+      }).promise();
+    }));
+
+    Promise.all(tweetsData.map(async ({ id }) => {
+      return await this.documentClient.delete({
+        TableName: 'tweets',
+        Key: {
+          'id': id
+        }
+      }).promise();
+    }));
+
+    return Promise.resolve();
+  }
 }
 
 export default Database;

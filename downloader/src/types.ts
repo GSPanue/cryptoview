@@ -70,6 +70,10 @@ interface TweetsObject {
 // Store Object
 interface StoreObject {
   id: string,
-  currency?: string,
+  ticker?: string,
   price?: Array<number>
+  timestamp?: number,
+  data?: {
+    timestamp: number
+  }
 }
