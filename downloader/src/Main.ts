@@ -90,7 +90,7 @@ class Main {
           );
         }
 
-        await this.timer(10000);
+        await this.delay(10000);
       }
     }
     catch(error) {
@@ -311,7 +311,7 @@ class Main {
     return Number(mode);
   }
 
-  private timer(ms: number) {
+  private delay(ms: number) {
     return new Promise((res) => (
       setTimeout(res, ms)
     ));
