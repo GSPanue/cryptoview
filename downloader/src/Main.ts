@@ -50,7 +50,7 @@ class Main {
         console.log(`Stored initial ${logString} data.\n`);
       }
 
-      console.log('Started download loop.\n');
+      console.log('Started download loop with a 10s delay.\n');
 
       // Repeatedly download new data
       while(true) {
@@ -89,6 +89,8 @@ class Main {
             'No new data was stored.\n'
           );
         }
+
+        await this.timer(10000);
       }
     }
     catch(error) {
@@ -307,6 +309,12 @@ class Main {
     let mode: string = Object.keys(counted).reduce((a, b) => counted[a] > counted[b] ? a : b);
 
     return Number(mode);
+  }
+
+  private timer(ms: number) {
+    return new Promise((res) => (
+      setTimeout(res, ms)
+    ));
   }
 }
 
