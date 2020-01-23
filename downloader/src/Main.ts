@@ -50,10 +50,10 @@ class Main {
         console.log(`Stored initial ${logString} data.\n`);
       }
 
-      console.log('Started loop with 10s delay.\n');
+      console.log('Started download loop.\n');
 
-      // Download new data every 10 seconds
-      setInterval(async () => {
+      // Repeatedly download new data
+      while(true) {
         console.log('Obtaining most recent price timestamp...');
 
         const nextTimestamp: number = await this.getNextTimestamp(['BTC', 'ETH', 'LTC', 'XRP']);
@@ -89,7 +89,7 @@ class Main {
             'No new data was stored.\n'
           );
         }
-      }, 10000);
+      }
     }
     catch(error) {
       console.log(error);
