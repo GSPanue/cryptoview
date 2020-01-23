@@ -125,6 +125,6 @@ export default {
 
 div >>> .apexcharts-toolbar {
   margin-top: -5px;
-  right: 102px;
+  right: 37px;
 }
 </style>
