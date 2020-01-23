@@ -2,7 +2,7 @@
   <el-col>
     <el-col class="header">
       <el-row type="flex">
-        <h3>{{ this.name }} (${{ this.ticker }})</h3>
+        <h3><strong>{{ this.name }}</strong> (${{ this.ticker }})</h3>
       </el-row>
       <el-row type="flex">
         <h4>Price Movements</h4>
