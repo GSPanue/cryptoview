@@ -4,5 +4,4 @@ downloader/dist
 **/bundle.min.js
 **/js/*.woff
 **/js/*.ttf
-aws
 .env
