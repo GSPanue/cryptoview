@@ -9,7 +9,7 @@
       </el-row>
     </el-col>
     <el-col>
-      <base-chart :ticker="this.ticker" />
+      <base-chart :ticker="this.ticker" :height="height" />
     </el-col>
   </el-col>
 </template>
@@ -19,7 +19,17 @@ export default {
   props: [
     'name',
     'ticker'
-  ]
+  ],
+  data() {
+    return {
+      height: null
+    }
+  },
+  mounted() {
+    const windowHeight = window.innerHeight;
+
+    this.height = (windowHeight < 900) ? 200 : null;
+  }
 }
 </script>
 
