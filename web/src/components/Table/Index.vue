@@ -120,4 +120,10 @@ export default {
 .el-table >>> .selected {
   font-weight: bold;
 }
+
+@media screen and (max-height: 899px) {
+  .el-table >>> tr > td {
+    padding: 8px 0;
+  }
+}
 </style>
