@@ -4,7 +4,7 @@
     "build": "webpack -p --config ./config/webpack.prod.config.babel.js"
   },
   "dependencies": {
-    "apexcharts": "^3.15.2",
+    "apexcharts": "^3.24.0",
     "element-ui": "^2.13.0",
     "vue": "^2.6.11",
     "vue-apexcharts": "^1.5.2",
